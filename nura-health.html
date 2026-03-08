@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nura Health — Precision Longevity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,700;1,900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+  :root {
+    --obsidian: #0D0D12;
+    --champagne: #C9A84C;
+    --champagne-light: #E8C97A;
+    --ivory: #FAF8F5;
+    --slate: #2A2A35;
+    --slate-light: #3A3A48;
+    --text-muted: #6B6B7A;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--obsidian);
+    color: var(--ivory);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--champagne);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, opacity 0.3s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(201,168,76,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.12s ease;
+  }
+  body:has(a:hover) .cursor, body:has(button:hover) .cursor { width: 20px; height: 20px; }
+
+  /* Noise overlay */
+  .noise {
+    position: fixed; inset: 0; z-index: 9990;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* NAVBAR */
+  nav {
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 1000;
+    display: flex; align-items: center; gap: 48px;
+    padding: 14px 32px;
+    border-radius: 100px;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
+    white-space: nowrap;
+  }
+  nav.scrolled {
+    background: rgba(13,13,18,0.7);
+    backdrop-filter: blur(20px);
+    border-color: rgba(201,168,76,0.15);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--champagne);
+    letter-spacing: 0.02em;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(250,248,245,0.6);
+    text-decoration: none;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .nav-links a:hover { color: var(--ivory); transform: translateY(-1px); }
+  .nav-cta {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--obsidian);
+    background: var(--champagne);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 100px;
+    cursor: none;
+    position: relative; overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s;
+  }
+  .nav-cta:hover { transform: scale(1.03); box-shadow: 0 0 24px rgba(201,168,76,0.4); }
+
+  /* HERO */
+  #hero {
+    height: 100dvh;
+    position: relative;
+    display: flex; align-items: flex-end;
+    padding: 0 7vw 8vh;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=1800&q=80');
+    background-size: cover; background-position: center;
+    z-index: 0;
+    transform: scale(1.05);
+  }
+  .hero-overlay {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(
+      to top,
+      rgba(13,13,18,0.98) 0%,
+      rgba(13,13,18,0.7) 40%,
+      rgba(13,13,18,0.3) 70%,
+      rgba(13,13,18,0.1) 100%
+    );
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 800px; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--champagne);
+    margin-bottom: 24px;
+    opacity: 0;
+  }
+  .hero-tag::before {
+    content: '';
+    display: block; width: 24px; height: 1px;
+    background: var(--champagne);
+  }
+  .hero-h1 {
+    line-height: 1;
+    margin-bottom: 32px;
+    opacity: 0;
+  }
+  .hero-h1 .line1 {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    letter-spacing: -0.03em;
+    color: var(--ivory);
+  }
+  .hero-h1 .line2 {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: clamp(4rem, 11vw, 10rem);
+    letter-spacing: -0.02em;
+    color: var(--champagne);
+    line-height: 0.9;
+  }
+  .hero-sub {
+    font-size: 1rem;
+    font-weight: 300;
+    color: rgba(250,248,245,0.55);
+    max-width: 420px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+    opacity: 0;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--champagne);
+    color: var(--obsidian);
+    font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 16px 36px;
+    border-radius: 100px; border: none; cursor: none;
+    text-decoration: none;
+    position: relative; overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.3s;
+    opacity: 0;
+  }
+  .hero-cta:hover { transform: scale(1.03); box-shadow: 0 8px 40px rgba(201,168,76,0.4); }
+  .hero-cta svg { transition: transform 0.3s ease; }
+  .hero-cta:hover svg { transform: translateX(4px); }
+
+  .hero-scroll-hint {
+    position: absolute; bottom: 40px; right: 7vw; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0;
+  }
+  .scroll-line {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, var(--champagne), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+  .scroll-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: rgba(201,168,76,0.5);
+    writing-mode: vertical-rl;
+  }
+
+  /* SECTION GLOBALS */
+  section { position: relative; }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--champagne);
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background:rgba(201,168,76,0.2); max-width:60px; }
+
+  /* FEATURES */
+  #features {
+    padding: 120px 7vw;
+    background: var(--obsidian);
+  }
+  .features-header { margin-bottom: 64px; }
+  .features-header h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; font-size: clamp(2rem, 4vw, 3.5rem);
+    letter-spacing: -0.03em; line-height: 1.1;
+    color: var(--ivory);
+  }
+  .features-header h2 em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; color: var(--champagne);
+    font-size: 1.2em;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  /* Feature Card Base */
+  .feat-card {
+    background: var(--slate);
+    border: 1px solid rgba(201,168,76,0.1);
+    border-radius: 2rem;
+    padding: 36px;
+    min-height: 420px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .feat-card:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-4px); }
+  .feat-card-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--champagne); margin-bottom: 12px;
+  }
+  .feat-card h3 {
+    font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em;
+    color: var(--ivory); margin-bottom: 8px;
+  }
+  .feat-card p {
+    font-size: 0.85rem; color: rgba(250,248,245,0.45);
+    line-height: 1.6; margin-bottom: 28px;
+  }
+
+  /* Card 1 — Diagnostic Shuffler */
+  .shuffler-stack {
+    position: relative; height: 160px;
+  }
+  .shuffle-item {
+    position: absolute; left: 0; right: 0;
+    background: rgba(13,13,18,0.8);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 1rem;
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .shuffle-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--champagne); flex-shrink: 0;
+  }
+  .shuffle-metric { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--champagne); }
+  .shuffle-value { font-size: 0.8rem; color: rgba(250,248,245,0.6); margin-left: auto; }
+
+  /* Card 2 — Typewriter */
+  .typewriter-terminal {
+    background: rgba(13,13,18,0.9);
+    border: 1px solid rgba(201,168,76,0.1);
+    border-radius: 1rem; padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; line-height: 1.8;
+    min-height: 160px;
+    position: relative;
+  }
+  .terminal-header {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+  .t-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .live-label {
+    margin-left: auto; font-size: 0.6rem; letter-spacing: 0.1em;
+    color: var(--champagne); display: flex; align-items: center; gap: 5px;
+  }
+  .live-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #4ade80;
+    animation: livePulse 1.5s ease-in-out infinite;
+  }
+  @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+  .typewriter-text { color: rgba(250,248,245,0.7); }
+  .typewriter-text .prompt { color: var(--champagne); margin-right: 8px; }
+  .cursor-blink {
+    display: inline-block; width: 7px; height: 13px;
+    background: var(--champagne); vertical-align: middle;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* Card 3 — Scheduler */
+  .scheduler-grid {
+    background: rgba(13,13,18,0.8);
+    border: 1px solid rgba(201,168,76,0.1);
+    border-radius: 1rem; padding: 20px;
+  }
+  .days-row {
+    display: grid; grid-template-columns: repeat(7,1fr); gap: 4px;
+    margin-bottom: 10px;
+  }
+  .day-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+    text-align: center; color: rgba(250,248,245,0.3); padding: 4px 0;
+  }
+  .day-cell {
+    aspect-ratio: 1; border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    color: rgba(250,248,245,0.3);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: default;
+  }
+  .day-cell.active {
+    background: rgba(201,168,76,0.2);
+    border-color: var(--champagne);
+    color: var(--champagne);
+    transform: scale(1.05);
+  }
+  .sched-save {
+    width: 100%; padding: 8px;
+    background: transparent; border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px; color: var(--champagne);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-top: 10px; cursor: default;
+    transition: all 0.3s;
+  }
+  .sched-save.pressed { background: rgba(201,168,76,0.2); transform: scale(0.97); }
+
+  /* PHILOSOPHY */
+  #philosophy {
+    padding: 160px 7vw;
+    background: var(--slate);
+    position: relative; overflow: hidden;
+  }
+  .phil-bg {
+    position: absolute; inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1600&q=80');
+    background-size: cover; background-position: center;
+    opacity: 0.06; z-index: 0;
+  }
+  .phil-content { position: relative; z-index: 1; max-width: 900px; }
+  .phil-contrast {
+    font-size: clamp(0.85rem, 1.5vw, 1rem);
+    color: rgba(250,248,245,0.35);
+    font-weight: 300;
+    margin-bottom: 32px;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+  }
+  .phil-statement {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ivory);
+  }
+  .phil-statement .accent { color: var(--champagne); }
+  .phil-word { display: inline-block; opacity: 0; transform: translateY(20px); }
+
+  /* PROTOCOL */
+  #protocol {
+    padding: 120px 7vw;
+    background: var(--obsidian);
+  }
+  .protocol-header { margin-bottom: 64px; }
+  .protocol-header h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700; letter-spacing: -0.03em;
+    color: var(--ivory);
+  }
+  .protocol-stack { display: flex; flex-direction: column; gap: 24px; }
+  .protocol-card {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 48px; align-items: center;
+    background: var(--slate);
+    border: 1px solid rgba(201,168,76,0.08);
+    border-radius: 2.5rem;
+    padding: 56px 64px;
+    transition: border-color 0.3s;
+  }
+  .protocol-card:hover { border-color: rgba(201,168,76,0.2); }
+  .protocol-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--champagne); margin-bottom: 20px;
+  }
+  .protocol-title {
+    font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+    font-weight: 700; letter-spacing: -0.02em;
+    color: var(--ivory); margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .protocol-desc {
+    font-size: 0.95rem; color: rgba(250,248,245,0.45);
+    line-height: 1.7;
+  }
+  .protocol-canvas { border-radius: 1.5rem; overflow: hidden; background: rgba(13,13,18,0.6); }
+  canvas { display: block; width: 100%; }
+
+  /* MEMBERSHIP */
+  #membership {
+    padding: 120px 7vw;
+    background: var(--slate);
+  }
+  .membership-header { margin-bottom: 64px; }
+  .membership-header h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700; letter-spacing: -0.03em; color: var(--ivory);
+  }
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 20px;
+  }
+  .price-card {
+    border: 1px solid rgba(201,168,76,0.1);
+    border-radius: 2rem; padding: 44px 36px;
+    position: relative; overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94), border-color 0.3s;
+  }
+  .price-card:hover { transform: translateY(-6px); border-color: rgba(201,168,76,0.25); }
+  .price-card.featured {
+    background: var(--champagne);
+    border-color: var(--champagne);
+    transform: scale(1.02);
+  }
+  .price-card.featured:hover { transform: scale(1.02) translateY(-6px); }
+  .price-tier {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--champagne); margin-bottom: 24px;
+  }
+  .price-card.featured .price-tier { color: rgba(13,13,18,0.6); }
+  .price-name {
+    font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;
+    color: var(--ivory); margin-bottom: 8px;
+  }
+  .price-card.featured .price-name { color: var(--obsidian); }
+  .price-amount {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 3rem; font-weight: 900;
+    color: var(--ivory); line-height: 1; margin-bottom: 4px;
+  }
+  .price-card.featured .price-amount { color: var(--obsidian); }
+  .price-period {
+    font-size: 0.8rem; color: rgba(250,248,245,0.4);
+    margin-bottom: 32px;
+  }
+  .price-card.featured .price-period { color: rgba(13,13,18,0.5); }
+  .price-features { list-style: none; margin-bottom: 36px; }
+  .price-features li {
+    font-size: 0.85rem; color: rgba(250,248,245,0.55);
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; gap: 10px; align-items: center;
+  }
+  .price-features li::before { content: '—'; color: var(--champagne); flex-shrink: 0; }
+  .price-card.featured .price-features li { color: rgba(13,13,18,0.65); border-bottom-color: rgba(13,13,18,0.1); }
+  .price-card.featured .price-features li::before { color: rgba(13,13,18,0.4); }
+  .price-btn {
+    width: 100%; padding: 14px;
+    border-radius: 100px; font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: none; border: none;
+    transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.3s;
+  }
+  .price-btn:hover { transform: scale(1.03); }
+  .price-btn-outline {
+    background: transparent; color: var(--ivory);
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+  .price-btn-outline:hover { border-color: var(--champagne); box-shadow: 0 0 20px rgba(201,168,76,0.2); }
+  .price-btn-featured {
+    background: var(--obsidian); color: var(--champagne);
+  }
+  .price-btn-featured:hover { box-shadow: 0 8px 30px rgba(13,13,18,0.5); }
+
+  /* FOOTER */
+  footer {
+    background: var(--obsidian);
+    border-top: 1px solid rgba(201,168,76,0.08);
+    padding: 80px 7vw 48px;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px; margin-bottom: 64px;
+  }
+  .footer-brand-name {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 1.8rem; color: var(--champagne);
+    margin-bottom: 12px;
+  }
+  .footer-tagline { font-size: 0.85rem; color: rgba(250,248,245,0.35); line-height: 1.6; max-width: 260px; }
+  .footer-col h4 {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(250,248,245,0.3); margin-bottom: 20px;
+  }
+  .footer-col a {
+    display: block; font-size: 0.85rem; color: rgba(250,248,245,0.5);
+    text-decoration: none; margin-bottom: 10px;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .footer-col a:hover { color: var(--ivory); transform: translateX(3px); }
+  .footer-bottom {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .status-indicator {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(250,248,245,0.35);
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #4ade80;
+    animation: livePulse 2s ease-in-out infinite;
+  }
+  .footer-legal { font-size: 0.75rem; color: rgba(250,248,245,0.2); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .features-grid, .pricing-grid { grid-template-columns: 1fr; }
+    .protocol-card { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    nav .nav-links { display: none; }
+    .price-card.featured { transform: none; }
+  }
+  @media (max-width: 600px) {
+    .footer-grid { grid-template-columns: 1fr; }
+    #hero { padding: 0 6vw 10vh; }
+  }
+
+  /* Scroll reveal defaults */
+  .reveal { opacity: 0; transform: translateY(30px); }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Nura</a>
+  <div class="nav-links">
+    <a href="#features">Science</a>
+    <a href="#philosophy">Philosophy</a>
+    <a href="#protocol">Protocol</a>
+    <a href="#membership">Membership</a>
+  </div>
+  <button class="nav-cta">Explore →</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-tag" id="heroTag">Precision Longevity Medicine</div>
+    <h1 class="hero-h1" id="heroH1">
+      <span class="line1">Longevity meets</span>
+      <span class="line2">Precision.</span>
+    </h1>
+    <p class="hero-sub" id="heroSub">Powered by your biological data. Guided by experts. Engineered to extend not just years — but the quality of every one of them.</p>
+    <a href="#features" class="hero-cta" id="heroCta">
+      Explore Nura
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </a>
+  </div>
+  <div class="hero-scroll-hint" id="heroScroll">
+    <span class="scroll-label">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="features-header reveal">
+    <div class="section-label">Core Science</div>
+    <h2>Three pillars of<br><em>biological mastery</em></h2>
+  </div>
+  <div class="features-grid">
+
+    <!-- Card 1: Diagnostic Shuffler -->
+    <div class="feat-card reveal">
+      <div class="feat-card-label">01 — Biomarker Tracking</div>
+      <h3>Real-Time Diagnostics</h3>
+      <p>Continuous monitoring of the markers that actually matter for longevity.</p>
+      <div class="shuffler-stack" id="shufflerStack">
+        <div class="shuffle-item" style="top:0;opacity:1;">
+          <div class="shuffle-dot"></div>
+          <span class="shuffle-metric">Cortisol Level</span>
+          <span class="shuffle-value">12.4 μg/dL ↓</span>
+        </div>
+        <div class="shuffle-item" style="top:56px;opacity:0.6;transform:scale(0.97)">
+          <div class="shuffle-dot"></div>
+          <span class="shuffle-metric">VO₂ Max</span>
+          <span class="shuffle-value">52.1 ml/kg ↑</span>
+        </div>
+        <div class="shuffle-item" style="top:104px;opacity:0.3;transform:scale(0.94)">
+          <div class="shuffle-dot"></div>
+          <span class="shuffle-metric">IGF-1 Index</span>
+          <span class="shuffle-value">187 ng/mL →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Typewriter -->
+    <div class="feat-card reveal">
+      <div class="feat-card-label">02 — Personalized Protocols</div>
+      <h3>Adaptive Intelligence</h3>
+      <p>Your protocol evolves in real-time as your biology changes.</p>
+      <div class="typewriter-terminal">
+        <div class="terminal-header">
+          <div class="t-dot" style="background:#E74C3C"></div>
+          <div class="t-dot" style="background:#F39C12"></div>
+          <div class="t-dot" style="background:#27AE60"></div>
+          <div class="live-label"><div class="live-dot"></div> Live Feed</div>
+        </div>
+        <div class="typewriter-text" id="typewriterText">
+          <span class="prompt">›</span><span id="twContent"></span><span class="cursor-blink"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Scheduler -->
+    <div class="feat-card reveal">
+      <div class="feat-card-label">03 — Expert Guidance</div>
+      <h3>Curated Cadence</h3>
+      <p>Expert-designed rhythms built around your unique biological clock.</p>
+      <div class="scheduler-grid">
+        <div class="days-row">
+          <div class="day-label">S</div><div class="day-label">M</div>
+          <div class="day-label">T</div><div class="day-label">W</div>
+          <div class="day-label">T</div><div class="day-label">F</div>
+          <div class="day-label">S</div>
+        </div>
+        <div class="days-row" id="daysRow">
+          <div class="day-cell">1</div><div class="day-cell">2</div>
+          <div class="day-cell">3</div><div class="day-cell">4</div>
+          <div class="day-cell">5</div><div class="day-cell">6</div>
+          <div class="day-cell">7</div>
+        </div>
+        <div class="days-row">
+          <div class="day-cell">8</div><div class="day-cell">9</div>
+          <div class="day-cell">10</div><div class="day-cell">11</div>
+          <div class="day-cell">12</div><div class="day-cell active">13</div>
+          <div class="day-cell">14</div>
+        </div>
+        <button class="sched-save" id="schedSave">Save Protocol</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section id="philosophy">
+  <div class="phil-bg"></div>
+  <div class="phil-content">
+    <div class="section-label">Our Belief</div>
+    <p class="phil-contrast reveal">Most medicine focuses on: treating disease after it appears — reactive, symptomatic, one-size-fits-all.</p>
+    <div class="phil-statement" id="philStatement">
+      We focus on: engineering
+      <span class="accent">longevity</span>
+      — before your biology asks you to.
+    </div>
+  </div>
+</section>
+
+<!-- PROTOCOL -->
+<section id="protocol">
+  <div class="protocol-header reveal">
+    <div class="section-label">The Method</div>
+    <h2>The Nura Protocol</h2>
+  </div>
+  <div class="protocol-stack">
+
+    <div class="protocol-card reveal">
+      <div>
+        <div class="protocol-num">Step 01 — Measure</div>
+        <h3 class="protocol-title">Deep Biological Baseline</h3>
+        <p class="protocol-desc">We map over 120 biomarkers — from inflammatory cytokines to epigenetic age — to establish your true biological age and trajectory.</p>
+      </div>
+      <div class="protocol-canvas">
+        <canvas id="canvas1" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="protocol-card reveal">
+      <div>
+        <div class="protocol-num">Step 02 — Model</div>
+        <h3 class="protocol-title">Precision Protocol Design</h3>
+        <p class="protocol-desc">Our AI synthesizes your data into a personalized intervention stack — nutrition, movement, sleep architecture, and targeted therapeutics.</p>
+      </div>
+      <div class="protocol-canvas">
+        <canvas id="canvas2" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="protocol-card reveal">
+      <div>
+        <div class="protocol-num">Step 03 — Monitor</div>
+        <h3 class="protocol-title">Continuous Refinement</h3>
+        <p class="protocol-desc">Monthly reassessments close the loop. Your protocol adapts as your biology evolves — a living system that grows with you.</p>
+      </div>
+      <div class="protocol-canvas">
+        <canvas id="canvas3" height="220"></canvas>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MEMBERSHIP -->
+<section id="membership">
+  <div class="membership-header reveal">
+    <div class="section-label">Membership</div>
+    <h2>Choose your<br>level of precision</h2>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card reveal">
+      <div class="price-tier">Tier 01</div>
+      <div class="price-name">Essential</div>
+      <div class="price-amount">$299</div>
+      <div class="price-period">per month</div>
+      <ul class="price-features">
+        <li>40 core biomarkers tracked</li>
+        <li>Quarterly protocol review</li>
+        <li>Digital dashboard access</li>
+        <li>Evidence-based guidance</li>
+      </ul>
+      <button class="price-btn price-btn-outline">Get Started</button>
+    </div>
+    <div class="price-card featured reveal">
+      <div class="price-tier">Tier 02 — Most Popular</div>
+      <div class="price-name">Performance</div>
+      <div class="price-amount">$699</div>
+      <div class="price-period">per month</div>
+      <ul class="price-features">
+        <li>120+ biomarkers — full panel</li>
+        <li>Monthly 1:1 physician consult</li>
+        <li>Real-time data integration</li>
+        <li>Adaptive AI protocol</li>
+        <li>Priority support</li>
+      </ul>
+      <button class="price-btn price-btn-featured">Explore Performance</button>
+    </div>
+    <div class="price-card reveal">
+      <div class="price-tier">Tier 03</div>
+      <div class="price-name">Enterprise</div>
+      <div class="price-amount">Custom</div>
+      <div class="price-period">bespoke pricing</div>
+      <ul class="price-features">
+        <li>Executive team programs</li>
+        <li>On-site testing & clinicians</li>
+        <li>White-label dashboards</li>
+        <li>Dedicated research team</li>
+      </ul>
+      <button class="price-btn price-btn-outline">Contact Us</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">Nura</div>
+      <p class="footer-tagline">Precision longevity medicine powered by biological data. Built for those who refuse to age on default settings.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Science</h4>
+      <a href="#">Biomarkers</a>
+      <a href="#">Research</a>
+      <a href="#">Technology</a>
+      <a href="#">Publications</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About</a>
+      <a href="#">Team</a>
+      <a href="#">Careers</a>
+      <a href="#">Press</a>
+    </div>
+    <div class="footer-col">
+      <h4>Members</h4>
+      <a href="#">Dashboard</a>
+      <a href="#">Protocols</a>
+      <a href="#">Support</a>
+      <a href="#">Community</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="status-indicator">
+      <div class="status-dot"></div>
+      All Systems Operational
+    </div>
+    <div class="footer-legal">© 2025 Nura Health Inc. · Privacy · Terms</div>
+  </div>
+</footer>
+
+<script>
+// ─── Custom Cursor ───────────────────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animateCursor() {
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// ─── GSAP + ScrollTrigger ────────────────────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero animations
+const ctx = gsap.context(() => {
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+  tl.to('#heroTag', { opacity: 1, y: 0, duration: 0.8 }, 0.3)
+    .to('#heroH1', { opacity: 1, duration: 0.1 }, 0.6)
+    .from('#heroH1 .line1', { y: 40, opacity: 0, duration: 0.9 }, 0.6)
+    .from('#heroH1 .line2', { y: 60, opacity: 0, duration: 1 }, 0.8)
+    .to('#heroSub', { opacity: 1, y: 0, duration: 0.8 }, 1.1)
+    .to('#heroCta', { opacity: 1, y: 0, duration: 0.7 }, 1.3)
+    .to('#heroScroll', { opacity: 1, duration: 0.6 }, 1.6);
+
+  // Hero parallax
+  gsap.to('.hero-bg', {
+    yPercent: 15,
+    ease: 'none',
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+  });
+
+  // Scroll reveals
+  gsap.utils.toArray('.reveal').forEach(el => {
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+    });
+  });
+
+  // Philosophy text reveal
+  const philEl = document.getElementById('philStatement');
+  const words = philEl.innerHTML.split(/(\s+)/);
+  philEl.innerHTML = '';
+  words.forEach(w => {
+    if (w.includes('<')) { philEl.innerHTML += w; return; }
+    if (w.trim()) {
+      const span = document.createElement('span');
+      span.className = 'phil-word';
+      span.textContent = w;
+      philEl.appendChild(span);
+    } else {
+      philEl.appendChild(document.createTextNode(w));
+    }
+  });
+  gsap.to('.phil-word', {
+    opacity: 1, y: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out',
+    scrollTrigger: { trigger: '#philosophy', start: 'top 70%' }
+  });
+
+  return () => ctx.revert();
+});
+
+// Navbar morph
+const navbar = document.getElementById('navbar');
+const heroObs = new IntersectionObserver(([e]) => {
+  navbar.classList.toggle('scrolled', !e.isIntersecting);
+}, { threshold: 0.1 });
+heroObs.observe(document.getElementById('hero'));
+
+// ─── Card 1: Diagnostic Shuffler ────────────────────────────────────────────
+const shuffleItems = [
+  { metric: 'Cortisol Level', value: '12.4 μg/dL ↓' },
+  { metric: 'VO₂ Max', value: '52.1 ml/kg ↑' },
+  { metric: 'IGF-1 Index', value: '187 ng/mL →' },
+  { metric: 'HRV Score', value: '68ms ↑↑' },
+  { metric: 'hsCRP', value: '0.4 mg/L ↓' },
+];
+let shuffleQueue = [...shuffleItems];
+const stack = document.getElementById('shufflerStack');
+
+function renderShuffle() {
+  stack.innerHTML = '';
+  const visible = shuffleQueue.slice(0, 3);
+  visible.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'shuffle-item';
+    div.style.cssText = `top:${i * 54}px;opacity:${1 - i * 0.3};transform:scale(${1 - i * 0.03});z-index:${3 - i};transition:all 0.6s cubic-bezier(0.34,1.56,0.64,1)`;
+    div.innerHTML = `<div class="shuffle-dot"></div><span class="shuffle-metric">${item.metric}</span><span class="shuffle-value">${item.value}</span>`;
+    stack.appendChild(div);
+  });
+}
+renderShuffle();
+setInterval(() => {
+  shuffleQueue.push(shuffleQueue.shift());
+  renderShuffle();
+}, 2500);
+
+// ─── Card 2: Typewriter ──────────────────────────────────────────────────────
+const messages = [
+  'Adjusting sleep protocol — phase shift detected',
+  'IGF-1 trending high — reducing mTOR activators',
+  'VO2 max +4% over 30d — increasing zone 3 load',
+  'Cortisol spike at 14:00 — reviewing stress markers',
+  'Protocol v12.3 deployed — 3 changes applied',
+];
+let msgIdx = 0, charIdx = 0;
+const twEl = document.getElementById('twContent');
+function typeChar() {
+  const msg = messages[msgIdx];
+  if (charIdx < msg.length) {
+    twEl.textContent += msg[charIdx++];
+    setTimeout(typeChar, 38 + Math.random() * 30);
+  } else {
+    setTimeout(() => {
+      twEl.textContent = '';
+      charIdx = 0;
+      msgIdx = (msgIdx + 1) % messages.length;
+      setTimeout(typeChar, 300);
+    }, 2200);
+  }
+}
+typeChar();
+
+// ─── Card 3: Scheduler ───────────────────────────────────────────────────────
+const dayCells = document.querySelectorAll('#daysRow .day-cell');
+const saveBtn = document.getElementById('schedSave');
+let schedStep = 0;
+const targetDays = [1, 3, 5];
+
+function runScheduler() {
+  dayCells.forEach(c => c.classList.remove('active'));
+  saveBtn.classList.remove('pressed');
+  const activateNext = (i) => {
+    if (i >= targetDays.length) {
+      setTimeout(() => { saveBtn.classList.add('pressed'); }, 400);
+      setTimeout(runScheduler, 3500);
+      return;
+    }
+    dayCells[targetDays[i]].classList.add('active');
+    setTimeout(() => activateNext(i + 1), 700);
+  };
+  setTimeout(() => activateNext(0), 600);
+}
+runScheduler();
+
+// ─── Canvas Animations ───────────────────────────────────────────────────────
+// Canvas 1: Rotating geometric rings
+(function() {
+  const c = document.getElementById('canvas1');
+  const ctx = c.getContext('2d');
+  c.width = c.offsetWidth; c.height = 220;
+  let angle = 0;
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    const cx = c.width / 2, cy = c.height / 2;
+    const gold = 'rgba(201,168,76,';
+    for (let r = 20; r <= 80; r += 20) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = gold + (0.08 + (r/80)*0.15) + ')';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    // rotating dashes
+    for (let i = 0; i < 16; i++) {
+      const a = angle + (i / 16) * Math.PI * 2;
+      const x1 = cx + Math.cos(a) * 88;
+      const y1 = cy + Math.sin(a) * 88;
+      const x2 = cx + Math.cos(a) * 96;
+      const y2 = cy + Math.sin(a) * 96;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+      ctx.strokeStyle = gold + '0.5)';
+      ctx.lineWidth = 2; ctx.stroke();
+    }
+    // cross lines
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(angle * 0.5);
+    ctx.strokeStyle = gold + '0.1)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-90, 0); ctx.lineTo(90, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, -90); ctx.lineTo(0, 90); ctx.stroke();
+    ctx.restore();
+    angle += 0.008;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Canvas 2: Scanning laser
+(function() {
+  const c = document.getElementById('canvas2');
+  const ctx = c.getContext('2d');
+  c.width = c.offsetWidth; c.height = 220;
+  const cols = 14, rows = 6;
+  const cellW = c.width / cols, cellH = c.height / rows;
+  let scanX = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    // dots grid
+    for (let col = 0; col < cols; col++) {
+      for (let row = 0; row < rows; row++) {
+        const x = col * cellW + cellW / 2;
+        const y = row * cellH + cellH / 2;
+        const dist = Math.abs(x - scanX);
+        const alpha = Math.max(0.05, 0.35 - dist / (c.width * 0.3));
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(201,168,76,${alpha})`;
+        ctx.fill();
+      }
+    }
+    // laser line
+    const grad = ctx.createLinearGradient(scanX - 60, 0, scanX + 60, 0);
+    grad.addColorStop(0, 'rgba(201,168,76,0)');
+    grad.addColorStop(0.5, 'rgba(201,168,76,0.6)');
+    grad.addColorStop(1, 'rgba(201,168,76,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(scanX - 60, 0, 120, c.height);
+    ctx.beginPath();
+    ctx.moveTo(scanX, 0); ctx.lineTo(scanX, c.height);
+    ctx.strokeStyle = 'rgba(201,168,76,0.5)';
+    ctx.lineWidth = 1; ctx.stroke();
+    scanX = (scanX + 1.4) % c.width;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Canvas 3: EKG waveform
+(function() {
+  const c = document.getElementById('canvas3');
+  const ctx = c.getContext('2d');
+  c.width = c.offsetWidth; c.height = 220;
+  let offset = 0;
+
+  function ekgY(x) {
+    const phase = (x + offset) % c.width;
+    const t = phase / c.width;
+    // EKG spike pattern
+    const seg = t % 0.2;
+    if (seg < 0.03) return 0.5;
+    if (seg < 0.05) return 0.5 - 0.08 * Math.sin((seg - 0.03) / 0.02 * Math.PI);
+    if (seg < 0.065) return 0.5 - 0.45 * Math.sin((seg - 0.05) / 0.015 * Math.PI);
+    if (seg < 0.075) return 0.5 + 0.18 * Math.sin((seg - 0.065) / 0.01 * Math.PI);
+    if (seg < 0.09) return 0.5 - 0.05 * Math.sin((seg - 0.075) / 0.015 * Math.PI);
+    return 0.5 + Math.sin(t * 12 + offset * 0.05) * 0.015;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    // grid lines
+    ctx.strokeStyle = 'rgba(201,168,76,0.05)';
+    ctx.lineWidth = 1;
+    for (let i = 1; i < 5; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, (i / 5) * c.height);
+      ctx.lineTo(c.width, (i / 5) * c.height);
+      ctx.stroke();
+    }
+    // EKG line
+    const grad = ctx.createLinearGradient(0, 0, c.width, 0);
+    grad.addColorStop(0, 'rgba(201,168,76,0)');
+    grad.addColorStop(0.2, 'rgba(201,168,76,0.6)');
+    grad.addColorStop(0.8, 'rgba(201,168,76,0.6)');
+    grad.addColorStop(1, 'rgba(201,168,76,0)');
+    ctx.beginPath();
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
+    for (let x = 0; x <= c.width; x++) {
+      const y = ekgY(x) * c.height;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    offset += 1.8;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Resize canvases
+window.addEventListener('resize', () => {
+  ['canvas1','canvas2','canvas3'].forEach(id => {
+    const c = document.getElementById(id);
+    c.width = c.offsetWidth;
+  });
+});
+</script>
+</body>
+</html>
